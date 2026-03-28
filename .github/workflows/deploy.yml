@@ -8,6 +8,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    environment: production
 
     steps:
       - name: Atualizar repositório local
@@ -15,6 +16,14 @@ jobs:
           cd /home/suporte/newdepl
           git fetch origin
           git reset --hard origin/main
+
+      - name: Mostrar commit que será implantado
+        run: |
+          cd /home/suporte/newdepl
+          echo "Commit atual:"
+          git rev-parse HEAD
+          echo "Último commit:"
+          git log -1 --oneline
 
       - name: Rebuild e subir containers
         run: |
@@ -24,4 +33,9 @@ jobs:
 
       - name: Mostrar status dos containers
         run: |
-          docker ps
+          cd /home/suporte/newdepl
+          docker compose ps
+
+      - name: Mostrar URL esperada
+        run: |
+          echo "Deploy finalizado. Teste no navegador ou com curl http://localhost"
