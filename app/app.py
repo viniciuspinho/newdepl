@@ -4,7 +4,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return "Nova versão deploy automático de novo com notificação de e-mail e rollback🔥"
+    return "Versão nova em produção - teste de rollback"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
