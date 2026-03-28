@@ -1,0 +1,27 @@
+name: Deploy Docker App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Atualizar repositório local
+        run: |
+          cd /home/suporte/newdepl
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Rebuild e subir containers
+        run: |
+          cd /home/suporte/newdepl
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Mostrar status dos containers
+        run: |
+          docker ps
