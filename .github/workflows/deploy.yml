@@ -6,36 +6,46 @@ on:
       - main
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  deploy-server1:
+    runs-on: [self-hosted, server1]
     environment: production
 
     steps:
-      - name: Atualizar repositório local
+      - name: Atualizar repositório local no server1
         run: |
           cd /home/suporte/newdepl
           git fetch origin
           git reset --hard origin/main
 
-      - name: Mostrar commit que será implantado
-        run: |
-          cd /home/suporte/newdepl
-          echo "Commit atual:"
-          git rev-parse HEAD
-          echo "Último commit:"
-          git log -1 --oneline
-
-      - name: Rebuild e subir containers
+      - name: Rebuild e subir containers no server1
         run: |
           cd /home/suporte/newdepl
           docker compose down || true
           docker compose up -d --build
 
-      - name: Mostrar status dos containers
+      - name: Mostrar status no server1
         run: |
           cd /home/suporte/newdepl
           docker compose ps
 
-      - name: Mostrar URL esperada
+  deploy-server2:
+    runs-on: [self-hosted, server2]
+    environment: production
+
+    steps:
+      - name: Atualizar repositório local no server2
         run: |
-          echo "Deploy finalizado. Teste no navegador ou com curl http://localhost"
+          cd /home/suporte/newdepl
+          git fetch origin
+          git reset --hard origin/main
+
+      - name: Rebuild e subir containers no server2
+        run: |
+          cd /home/suporte/newdepl
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Mostrar status no server2
+        run: |
+          cd /home/suporte/newdepl
+          docker compose ps
