@@ -9,40 +9,54 @@ on:
         default: "main"
 
 jobs:
-  rollback:
-    runs-on: self-hosted
+  rollback-server1:
+    runs-on: [self-hosted, server1]
     environment: production
 
     steps:
-      - name: Buscar commits e tags
+      - name: Buscar commits e tags no server1
         run: |
           cd /home/suporte/newdepl
           git fetch --all --tags
 
-      - name: Mostrar referência escolhida
-        run: |
-          echo "Rollback solicitado para: ${{ github.event.inputs.target_ref }}"
-
-      - name: Aplicar rollback no repositório local
+      - name: Aplicar rollback no server1
         run: |
           cd /home/suporte/newdepl
           git reset --hard ${{ github.event.inputs.target_ref }}
 
-      - name: Mostrar commit restaurado
-        run: |
-          cd /home/suporte/newdepl
-          echo "Commit restaurado:"
-          git rev-parse HEAD
-          echo "Detalhes:"
-          git log -1 --oneline
-
-      - name: Rebuild e subir containers
+      - name: Rebuild e subir containers no server1
         run: |
           cd /home/suporte/newdepl
           docker compose down || true
           docker compose up -d --build
 
-      - name: Mostrar status dos containers
+      - name: Mostrar status no server1
+        run: |
+          cd /home/suporte/newdepl
+          docker compose ps
+
+  rollback-server2:
+    runs-on: [self-hosted, server2]
+    environment: production
+
+    steps:
+      - name: Buscar commits e tags no server2
+        run: |
+          cd /home/suporte/newdepl
+          git fetch --all --tags
+
+      - name: Aplicar rollback no server2
+        run: |
+          cd /home/suporte/newdepl
+          git reset --hard ${{ github.event.inputs.target_ref }}
+
+      - name: Rebuild e subir containers no server2
+        run: |
+          cd /home/suporte/newdepl
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Mostrar status no server2
         run: |
           cd /home/suporte/newdepl
           docker compose ps
