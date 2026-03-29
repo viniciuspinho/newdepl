@@ -1,0 +1,48 @@
+name: Rollback Docker App
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_ref:
+        description: "Tag ou commit para rollback"
+        required: true
+        default: "main"
+
+jobs:
+  rollback:
+    runs-on: self-hosted
+    environment: production
+
+    steps:
+      - name: Buscar commits e tags
+        run: |
+          cd /home/suporte/newdepl
+          git fetch --all --tags
+
+      - name: Mostrar referência escolhida
+        run: |
+          echo "Rollback solicitado para: ${{ github.event.inputs.target_ref }}"
+
+      - name: Aplicar rollback no repositório local
+        run: |
+          cd /home/suporte/newdepl
+          git reset --hard ${{ github.event.inputs.target_ref }}
+
+      - name: Mostrar commit restaurado
+        run: |
+          cd /home/suporte/newdepl
+          echo "Commit restaurado:"
+          git rev-parse HEAD
+          echo "Detalhes:"
+          git log -1 --oneline
+
+      - name: Rebuild e subir containers
+        run: |
+          cd /home/suporte/newdepl
+          docker compose down || true
+          docker compose up -d --build
+
+      - name: Mostrar status dos containers
+        run: |
+          cd /home/suporte/newdepl
+          docker compose ps
